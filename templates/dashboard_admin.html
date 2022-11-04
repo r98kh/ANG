@@ -1,0 +1,124 @@
+{% extends './base.html' %}
+
+{% load static %}
+{% load jalali_tags %}
+
+{% block title %}داشبورد{% endblock title %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-12 col-md-12 col-lg-12 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+                  <span class="d-block text-nowrap pt-1">سامانه ثبت سفارش محصولات گروه صنعتی ANG</span>
+
+    </div>
+    </div>
+  </div>
+    </div>
+
+
+<div class="row">
+  <div class="col-6 col-md-4 col-lg-3 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="avatar mx-auto mb-2">
+          <span class="avatar-initial rounded-circle bg-label-info">
+            <i class="bx bx-user fs-4"></i>
+          </span>
+        </div>
+        <span class="d-block text-nowrap pt-1">مشتریان</span>
+        <h2 class="mb-n3">{{ users }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-lg-3 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="avatar mx-auto mb-2">
+          <span class="avatar-initial rounded-circle bg-label-danger">
+            <i class="bx bx-shopping-bag fs-4"></i>
+          </span>
+        </div>
+        <span class="d-block text-nowrap pt-1">سفارش</span>
+        <h2 class="mb-n3">{{ orders|length }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-lg-3 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="avatar mx-auto mb-2">
+          <span class="avatar-initial rounded-circle bg-label-success">
+            <i class="bx bx-message fs-4"></i>
+          </span>
+        </div>
+        <span class="d-block text-nowrap pt-1">پیام ها</span>
+        <h2 class="mb-n3">0</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-lg-3 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="avatar mx-auto mb-2">
+          <span class="avatar-initial rounded-circle bg-label-warning">
+            <i class="bx bx-file fs-4"></i>
+          </span>
+        </div>
+        <span class="d-block text-nowrap pt-1">فایل های ضمیمه شده</span>
+        <h2 class="mb-n3">0</h2>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <i class="bx bx-bell font-medium-4 mr-1"></i>
+        سفارشات
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table border-top">
+            <tbody class="table-border-bottom-0">
+              {% for order in orders|slice:"10" %}
+              <tr>
+                <td>
+                  سفارش جدید به نام <div class="badge bg-label-success">
+                    {{ order.user.profile.get_full_name }}</div>
+                  و شماره تراکنش
+                  <div class="badge bg-label-success">{{ order.transaction_id }}</div>
+                  ثبت شد
+                </td>
+                <td>{{ order.createdAt|to_jalali:'%y/%m/%d' }}</td>
+                <td>
+                  <div class="dropdown">
+                    <button class="btn p-0" type="button" id="action1" data-bs-toggle="dropdown" aria-haspopup="true"
+                      aria-expanded="false">
+                      <i class="bx bx-dots-vertical-rounded"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="action1" style="">
+                      <a class="dropdown-item" href="{% url 'order_detail' order.id %}"><i class="bx bx-show mr-1"></i>
+                        مشاهده سفارش</a>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

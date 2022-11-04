@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fa" class="light-style layout-navbar-fixed layout-menu-fixed" dir="rtl" data-theme="theme-default"
+    data-assets-path="/static/" data-template="vertical-menu-template">
+
+<head>
+    {% load static %}
+    {% load jalali_tags %}
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <title>پنل مدیریت - {% block title %}{% endblock title %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="{% static 'vendor/fonts/boxicons.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/fonts/fontawesome.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/fonts/flag-icons.css' %}">
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'vendor/css/rtl/core.css' %}" class="template-customizer-core-css">
+    <link rel="stylesheet" href="{% static 'vendor/css/rtl/theme-default.css' %}" class="template-customizer-theme-css">
+    <link rel="stylesheet" href="{% static 'css/demo.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/css/rtl/rtl.css' %}">
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/libs/typeahead-js/typeahead.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/libs/pickr/pickr-themes.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/libs/tagify/tagify.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}">
+
+
+    <!-- Helpers -->
+    <script src="{% static 'vendor/js/helpers.js' %}"></script>
+    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+    <script src="{% static 'vendor/js/template-customizer.js' %}"></script>
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{% static 'js/config.js' %}"></script>
+
+    <script type="text/javascript">
+        var user = '{{ request.user }}'
+
+        function getToken(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getToken('csrftoken');
+    </script>
+
+    <style>
+        label {
+            color: #475F7B;
+            font-size: .8rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            line-height: 1.85;
+            min-height: 1.85em;
+        }
+    </style>
+
+</head>
+<!-- END: Head-->
+
+<!-- BEGIN: Body-->
+
+<body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+        <div class="layout-container">
+
+            <!-- Menu -->
+            <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+                <div class="app-brand demo">
+                    <a href="/admin/" class="app-brand-link">
+                        
+                        <span class="app-brand-text demo menu-text fw-bold ms-2">پنل مدیریت</span>
+                    </a>
+
+                    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+                        <i class="bx menu-toggle-icon d-none d-xl-block fs-4 align-middle"></i>
+                        <i class="bx bx-x d-block d-xl-none bx-sm align-middle"></i>
+                    </a>
+                </div>
+
+                <div class="menu-divider mt-0"></div>
+
+                <div class="menu-inner-shadow"></div>
+
+                <ul class="menu-inner py-1">
+                    <!-- Dashboards -->
+                    <li class="menu-item {% if 'dashboard' in request.resolver_match.url_name %} active {% endif %}">
+                        <a {% if request.user.is_staff %} href="/admin/" {% else %} href="/" {% endif %}
+                            class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                            <div data-i18n="Dashboard">داشبورد</div>
+                        </a>
+                    </li>
+
+                    <!-- Profile -->
+                    <li class="menu-item {% if 'profile' in request.resolver_match.url_name %} active {% endif %}">
+                        <a {% if request.user.is_staff %} href="{% url 'admin_profile' %}" {% else %}
+                            href="{% url 'profile' %}" {% endif %} class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-receipt"></i>
+                            <div data-i18n="profile">پروفایل</div>
+                        </a>
+                    </li>
+
+                    <!-- Products -->
+                    {% if perms.product.view_product or perms.product.add_product %}
+                    <li
+                        class="menu-item {% if 'product' in request.resolver_match.url_name or 'feature' in request.resolver_match.url_name %} open {% endif %}">
+                        <a href="javascript:void(0)" class="menu-link menu-toggle">
+                            <i class="menu-icon tf-icons bx bx-package"></i>
+                            <div data-i18n="users">مدیریت محصولات</div>
+                        </a>
+                        <ul class="menu-sub">
+                            {% if perms.product.add_product %}
+                            <li
+                                class="menu-item {% if request.resolver_match.url_name == 'product_add' %} active {% endif %}">
+                                <a href="{% url 'product_add' %}" class="menu-link">
+                                    <div data-i18n="User add">افزودن محصول</div>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if perms.product.add_product %}
+                            <li
+                                class="menu-item {% if 'feature' in request.resolver_match.url_name %} active {% endif %}">
+                                <a href="{% url 'feature_list' %}" class="menu-link">
+                                    <div data-i18n="User add">مشخصه محصول</div>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if perms.product.view_product %}
+                            <li
+                                class="menu-item{% if request.resolver_match.url_name == 'product_list' %} active {% endif %}">
+                                <a href="{% url 'product_list' %}" class="menu-link">
+                                    <div data-i18n="Users list">لیست محصولات</div>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    <!-- Orders -->
+                    <li class="menu-item {% if 'order' in request.resolver_match.url_name %} open {% endif %}">
+                        <a href="javascript:void(0)" class="menu-link menu-toggle">
+                            <i class="menu-icon tf-icons bx bx-food-menu"></i>
+                            <div data-i18n="users">سفارشات
+                                {% if request.user.is_staff %}
+                                <span
+                                    class="badge badge-light-danger badge-pill badge-round float-right mr-2">{{ unread_orders }}</span>
+                                {% endif %}
+                            </div>
+                        </a>
+                        <ul class="menu-sub">
+                            {% if request.user.is_staff %}
+                            <li
+                                class="menu-item {% if request.resolver_match.url_name == 'admin_order_list' %} active {% endif %}">
+                                <a href="{% url 'admin_order_list' %}" class="menu-link">
+                                    <div data-i18n="Users list">لیست سفارشات</div>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li
+                                class="menu-item {% if request.resolver_match.url_name == 'order_list' %} active {% endif %}">
+                                <a href="{% url 'order_list' %}" class="menu-link">
+                                    <div data-i18n="Users list">لیست سفارشات</div>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if request.user.is_staff %}
+                            <li
+                                class="menu-item {% if request.resolver_match.url_name == 'admin_order_add' %} active {% endif %}">
+                                <a href="{% url 'admin_order_add' %}" class="menu-link">
+                                    <div data-i18n="User add">ثبت سفارش</div>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li
+                                class="menu-item {% if request.resolver_match.url_name == 'order_add' %} active {% endif %}">
+                                <a href="{% url 'order_add' %}" class="menu-link">
+                                    <div data-i18n="User add">ثبت سفارش</div>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+
+                    <!-- Users -->
+                    {% if perms.users.view_user or perms.users.add_user %}
+                    <li class="menu-item {% if 'user' in request.resolver_match.url_name %} open {% endif %}">
+                        <a href="javascript:void(0)" class="menu-link menu-toggle">
+                            <i class="menu-icon tf-icons bx bx-user"></i>
+                            <div data-i18n="users">مشتریان</div>
+                        </a>
+                        <ul class="menu-sub">
+                            {% if perms.auth.view_user %}
+                            <li
+                                class="menu-item {% if request.resolver_match.url_name == 'users_list' %} active {% endif %}">
+                                <a href="{% url 'users_list' %}" class="menu-link">
+                                    <div data-i18n="Users list">لیست مشتریان</div>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if perms.auth.add_user %}
+                            <li
+                                class="menu-item {% if request.resolver_match.url_name == 'user_add' %} active {% endif %}">
+                                <a href="{% url 'user_add' %}" class="menu-link">
+                                    <div data-i18n="User add">ثبت مشتری</div>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    <!-- Experts -->
+                    {% if perms.users.view_user %}
+                    <li class="menu-item {% if 'expert' in request.resolver_match.url_name %} open {% endif %}">
+                        <a href="javascript:void(0)" class="menu-link menu-toggle">
+                            <i class="menu-icon tf-icons bx bx-user"></i>
+                            <div data-i18n="users">کارشناسان</div>
+                        </a>
+                        <ul class="menu-sub">
+                            {% if perms.users.view_user %}
+                            <li
+                                class="menu-item {% if request.resolver_match.url_name == 'expert_list' %} active {% endif %}">
+                                <a href="{% url 'expert_list' %}" class="menu-link">
+                                    <div data-i18n="Users list">لیست کارشناسان</div>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if perms.auth.add_user %}
+                            <li
+                                class="menu-item {% if request.resolver_match.url_name == 'expert_add' %} active {% endif %}">
+                                <a href="{% url 'expert_add' %}" class="menu-link">
+                                    <div data-i18n="User add">ثبت کارشناس</div>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    <!-- Report -->
+                    {% if request.user.is_staff %}
+                    <li class="menu-item  {% if 'report' in request.resolver_match.url_name %} active {% endif %}">
+                        <a href="{% url 'report_list' %}" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-notepad"></i>
+                            <div data-i18n="Dashboard">لیست شکایات</div>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Change Password -->
+                    {% if request.user.is_staff %}
+                    <li class="menu-item">
+                        <a href="{% url 'change_password' %}" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-lock"></i>
+                            <div data-i18n="profile">تغییر رمزعبور</div>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Logout -->
+                    <li class="menu-item">
+                        <a href="{% if request.user.is_staff %} {% url 'admin_logout' %} {% else %} {% url 'logout' %}{% endif %}"
+                            class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-log-out-circle"></i>
+                            <div data-i18n="profile">خروج</div>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+            <!-- / Menu -->
+
+            <!-- Layout container -->
+            <div class="layout-page">
+
+                <!-- Navbar -->
+                <nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme"
+                    id="layout-navbar">
+                    <div class="container-fluid">
+                        <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                            <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                                <i class="bx bx-menu bx-sm"></i>
+                            </a>
+                        </div>
+
+                        <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+
+                            <ul class="navbar-nav flex-row align-items-center ms-auto">
+                                <!-- Style Switcher -->
+                                <li class="nav-item me-2 me-xl-0">
+                                    <a class="nav-link style-switcher-toggle hide-arrow" href="javascript:void(0);">
+                                        <i class="bx bx-sm"></i>
+                                    </a>
+                                </li>
+                                <!--/ Style Switcher -->
+
+                                <!-- Notification -->
+                                <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
+                                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
+                                        data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                        <i class="bx bx-bell bx-sm"></i>
+                                        <span class="badge bg-danger rounded-pill badge-notifications">5</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end py-0">
+                                        <li class="dropdown-menu-header border-bottom">
+                                            <div class="dropdown-header d-flex align-items-center py-3">
+                                                <h5 class="text-body mb-0 me-auto secondary-font">اعلان‌ها</h5>
+                                                <a href="javascript:void(0)"
+                                                    class="dropdown-notifications-all text-body"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="علامت خوانده شده به همه"><i
+                                                        class="bx fs-4 bx-envelope-open"></i></a>
+                                            </div>
+                                        </li>
+                                        <li class="dropdown-notifications-list scrollable-container">
+                                            <ul class="list-group list-group-flush">
+                                                <li
+                                                    class="list-group-item list-group-item-action dropdown-notifications-item">
+                                                    <div class="d-flex">
+                                                        <div class="flex-shrink-0 me-3">
+                                                            <div class="avatar">
+                                                                <!-- <img src="../../assets/img/avatars/1.png" alt
+                                                                    class="w-px-40 h-auto rounded-circle"> -->
+                                                                    <i class="bx bx-user"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <h6 class="mb-1">لورم ایپسوم متن ساختگی با</h6>
+                                                            <p class="mb-1">لورم ایپسوم متن ساختگی با تولید سادگی
+                                                                نامفهوم</p>
+                                                            <small class="text-muted">1 ساعت قبل</small>
+                                                        </div>
+                                                        <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                            <a href="javascript:void(0)"
+                                                                class="dropdown-notifications-read"><span
+                                                                    class="badge badge-dot"></span></a>
+                                                            <a href="javascript:void(0)"
+                                                                class="dropdown-notifications-archive"><span
+                                                                    class="bx bx-x"></span></a>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li
+                                                    class="list-group-item list-group-item-action dropdown-notifications-item">
+                                                    <div class="d-flex">
+                                                        <div class="flex-shrink-0 me-3">
+                                                            <div class="avatar">
+                                                                <span
+                                                                    class="avatar-initial rounded-circle bg-label-danger">اک</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <h6 class="mb-1">لورم ایپسوم متن ساختگی</h6>
+                                                            <p class="mb-1">لورم ایپسوم متن ساختگی با</p>
+                                                            <small class="text-muted">12 ساعت قبل</small>
+                                                        </div>
+                                                        <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                            <a href="javascript:void(0)"
+                                                                class="dropdown-notifications-read"><span
+                                                                    class="badge badge-dot"></span></a>
+                                                            <a href="javascript:void(0)"
+                                                                class="dropdown-notifications-archive"><span
+                                                                    class="bx bx-x"></span></a>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li class="dropdown-menu-footer border-top">
+                                            <a href="javascript:void(0);"
+                                                class="dropdown-item d-flex justify-content-center p-3">
+                                                مشاهده همه اعلان‌ها
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <!--/ Notification -->
+
+                                <!-- User -->
+                                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
+                                        data-bs-toggle="dropdown">
+                                        <div class="avatar avatar-online">
+                                            <img src="{% static 'img/avatars/default.png' %}" alt
+                                                class="rounded-circle">
+                                        </div>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item" href="pages-account-settings-account.html">
+                                                <div class="d-flex">
+                                                    <div class="flex-grow-1">
+                                                        <span class="fw-semibold d-block">
+                                                            {% if request.user.is_superuser %}
+                                                            مدیریت
+                                                            {% else %}
+                                                            {{ request.user.profile }}
+                                                            {% endif %}
+                                                        </span>
+                                                        <small>
+                                                            {% if request.user.is_superuser %}
+                                                            مدیر
+                                                            {% else %}
+                                                            {{ request.user.profile.role.name }}
+                                                            {% endif %}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <div class="dropdown-divider"></div>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'profile' %}">
+                                                <i class="bx bx-user me-2"></i>
+                                                <span class="align-middle">پروفایل من</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'change_password' %}">
+                                                <i class="bx bx-cog me-2"></i>
+                                                <span class="align-middle">تغییر رمزعبور</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <div class="dropdown-divider"></div>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                                {% if request.user.is_superuser or request.user.is_staff %}
+                                                href="{% url 'admin_logout' %}" {% else %} href="{% url 'logout' %}"
+                                                {% endif %} target="_blank">
+                                                <i class="bx bx-power-off me-2"></i>
+                                                <span class="align-middle">خروج</span>
+                                            </a>
+                                        </li>
+                                       
+                                    </ul>
+                                </li>
+                                <!--/ User -->
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+                <!-- / Navbar -->
+
+                <!-- BEGIN: Content-->
+                <div class="content-wrapper">
+                    <!-- Content -->
+                    <div class="container-xxl flex-grow-1 container-p-y">
+                        {% block content %}
+                        {% endblock content %}
+                    </div>
+
+                    <!-- Footer -->
+                    <footer class=" content-footer footer bg-footer-theme">
+                        <div
+                            class="container-fluid d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+                            <div class="mb-2 mb-md-0"> طراحی و اجرا - واحد تحقیق و توسعه گروه صنعتی ANG </div>
+                            <div>
+                                <a href="#" class="footer-link me-4" target="_blank"></a>
+
+                            </div>
+                        </div>
+                    </footer>
+                    <!-- / Footer -->
+                    <div class="content-backdrop fade"></div>
+                </div>
+                <!-- END: Content-->
+            </div>
+            <!-- Content wrapper -->
+        </div>
+        <!-- Overlay -->
+        <div class="layout-overlay layout-menu-toggle"></div>
+
+        <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+        <div class="drag-target"></div>
+    </div>
+    <!-- / Layout wrapper -->
+
+    <!-- Core JS -->
+    <!-- build:js assets/vendor/js/core.js -->
+    <script src="{% static 'vendor/libs/jquery/jquery.js' %}"></script>
+    <script src="{% static 'vendor/libs/popper/popper.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap.js' %}"></script>
+    <script src="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+
+    <script src="{% static 'vendor/libs/hammer/hammer.js' %}"></script>
+
+    <script src="{% static 'vendor/libs/i18n/i18n.js' %}"></script>
+    <script src="{% static 'vendor/libs/typeahead-js/typeahead.js' %}"></script>
+
+    <script src="{% static 'vendor/js/menu.js' %}"></script>
+    <!-- endbuild -->
+
+    <!-- Vendors JS -->
+    <script src="{% static 'vendor/libs/jdate/jdate.js' %}"></script>
+    <script src="{% static 'vendor/libs/flatpickr/flatpickr-jdate.js' %}"></script>
+    <script src="{% static 'vendor/libs/flatpickr/l10n/fa-jdate.js' %}"></script>
+    <script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+    <script src="{% static 'vendor/libs/pickr/pickr.js' %}"></script>
+    <script src="{% static 'vendor/libs/sortablejs/sortable.js' %}"></script>
+    <script src="{% static 'vendor/libs/jquery-repeater/jquery-repeater.js' %}"></script>
+
+    <script src="{% static 'vendor/libs/formvalidation/dist/js/FormValidation.min.js' %}"></script>
+    <script src="{% static 'vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js' %}"></script>
+    <script src="{% static 'vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js' %}"></script>
+
+    <!-- Main JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Vendors JS -->
+    <script src="{% static 'vendor/libs/autosize/autosize.js' %}"></script>
+    <script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
+    <script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+    <script src="{% static 'vendor/libs/select2/i18n/fa.js' %}"></script>
+    <script src="{% static 'vendor/libs/tagify/tagify.js' %}"></script>
+
+    <!-- Page JS -->
+    <script src="{% static 'js/forms-extras.js' %}"></script>
+    <script src="{% static 'js/dashboards-analytics.js' %}"></script>
+    <!-- <script src="{% static 'js/app-access-roles.js' %}"></script> -->
+    <!-- <script src="{% static 'js/modal-add-role.js' %}"></script> -->
+    <script src="{% static 'js/forms-selects.js' %}"></script>
+    <script src="{% static 'js/forms-tagify.js' %}"></script>
+    <script src="{% static 'js/forms-pickers.js' %}"></script>
+    <script src="{% static 'js/extended-ui-sweetalert2.js' %}"></script>
+    <script src="{% static 'js/extended-ui-drag-and-drop.js' %}"></script>
+
+    <script src="{% static 'js/paginate.js' %}"></script>
+    <script src="{% static 'js/product-feature.js' %}"></script>
+    <script src="{% static 'js/order/pre-order.js' %}"></script>
+    <script src="{% static 'js/order/change-order-status.js' %}"></script>
+    <script src="{% static 'js/order/complete-order.js' %}"></script>
+    <script src="{% static 'js/update-city.js' %}"></script>
+    <script src="{% static 'js/status-switch.js' %}"></script>
+    <script src="{% static 'js/feature-edit.js' %}"></script>
+    <script src="{% static 'js/feature-add.js' %}"></script>
+    <script src="{% static 'js/filter-color.js' %}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function (e) {
+            (function () {
+                // Select All checkbox click
+                const selectAll = document.querySelector('#selectAll'),
+                    checkboxList = document.querySelectorAll('.table [type="checkbox"]');
+                if (selectAll) {
+                    selectAll.addEventListener('change', t => {
+                        checkboxList.forEach(e => {
+                            e.checked = t.target.checked;
+                        });
+                    });
+                }
+            })();
+        });
+    </script>
+</body>
+<!-- END: Body-->
+
+</html>

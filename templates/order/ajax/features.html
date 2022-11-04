@@ -1,0 +1,28 @@
+{% regroup featurevalues by featurevalue__feature__perName as feature_list %}
+
+{% if colors %}
+<div class="col-md-3 mb-2">
+    <label for="" class="form-label">رنگ*</label>
+    <select class="select2 form-select" name="color">
+        {% for color in colors %}
+        <option value="{{ color.color.id }}">{{ color.color.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+{% endif %}
+
+{% for featurevalue__feature__perName in feature_list %}
+<div class="col-md-3 mb-2">
+    <label for="" class="form-label">{{ featurevalue__feature__perName.grouper }}*</label>
+    <select name="productfeaturevalue" class="select2 form-select" required id="">
+        {% for i in featurevalue__feature__perName.list %}
+        <option value="{{ i.featurevalue__feature__id }}|{{ i.featurevalue__id }}">{{ i.featurevalue__name }}</option>
+        {% endfor %}
+    </select>
+</div>
+{% endfor %}
+
+<div class="col-md-3 mb-2">
+    <label for="" class="form-label">تعداد*</label>
+    <input type="number" class="form-control" name="quantity" min="1" required>
+</div>

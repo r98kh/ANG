@@ -1,0 +1,128 @@
+{% extends '../base.html' %}
+
+{% load static %}
+{% load jalali_tags %}
+{% load crispy_forms_tags %}
+
+{% block title %}ویرایش مشتری{% endblock title %}
+
+{% block content %}
+<style>
+    label {
+        font-size: 0.75rem;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-style1">
+                <li class="breadcrumb-item">
+                    <a href="#">خانه</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'users_list' %}">لیست کاربران</a>
+                </li>
+                <li class="breadcrumb-item active">ویرایش کاربر</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="card-body">
+        {% for message in messages %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger">{{ message }}</div>
+        {% else %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endif %}
+        {% endfor %}
+        <form class="form-horizontal error" method="post">
+            <div class="row">
+                {% csrf_token %}
+                <div class="col-md-6 mb-2">
+                    <div class="custom-control custom-switch custom-switch-success mr-2 mb-1">
+                        <p class="mb-0">وضعیت</p>
+                        <select name="status" class="form-select">
+                            <option value="1" {% if user.is_active %} selected {% endif %}>فعال</option>
+                            <option value="0" {% if not user.is_active %} selected {% endif %}>غیرفعال</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label">کارشناس</label>
+                    <select name="expert" class="form-select">
+                        <option value="">لطفا انتخاب کنید</option>
+                        {% for expert in experts %}
+                        <option value="{{ expert.id }}" {% if expert.id == profile.expert.id %} selected {% endif %}>
+                            {{ expert.user.first_name }}
+                            {{ expert.user.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    {{ form.fname|as_crispy_field }}
+                </div>
+                <div class="col-md-4 mb-2">
+                    {{ form.lname|as_crispy_field }}
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label class="form-label">شماره همراه*</label>
+                    <input type="text" class="form-control" name="mobile" value="{{ profile.mobile }}">
+                </div>
+                <div class="col-md-6 mb-2">
+                    {{ form.id_code|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-2">
+                    <!-- Datetime Picker-->
+                    <label for="flatpickr-datetime1" class="form-label">تاریخ تولد*</label>
+                    <input type="text" class="form-control" placeholder="YYYY/MM/DD" id="flatpickr-datetime1"
+                        name="birth_date" required value="{{ profile.birth_date }}">
+                    <!-- /Datetime Picker-->
+                </div>
+
+                {% if profile.role == '2' %}
+                <div class="col-md-4 mb-2">{{ form.company_name|as_crispy_field }}</div>
+                <div class="col-md-4 mb-2">{{ form.phone|as_crispy_field }}</div>
+                <div class="col-md-4 mb-2">{{ form.finance_code|as_crispy_field }}</div>
+                {% endif %}
+
+                <div class="col-md-4 mb-2">
+                    <label class="form-label">استان*</label>
+                    <select name="state" id="id_state" class="form-control state_select" data-id="1">
+                        <option value="">--------</option>
+                        {% for state in states %}
+                        <option value="{{ state.state_id }}" {% if profile.state.state_id == state.state_id %} selected
+                            {% endif %}>
+                            {{ state.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label class="form-label">شهر*</label>
+                    <select name="city" id="id_city_1" class="form-control">
+                        <option value="{{ profile.city.id }}">{{ profile.city.name }}</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label class="form-label">کدپستی*</label>
+                    <input type="text" class="form-control" name="zipcode" value="{{ profile.zipcode }}">
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-12 mb-2">
+                    <label class="form-label">آدرس*</label>
+                    <textarea class="form-control" name="address" cols="30" rows="1">{{ profile.address }}</textarea>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12" style="text-align: left;">
+                    <button type="submit" class="btn btn-label-primary mt-1">ویرایش</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

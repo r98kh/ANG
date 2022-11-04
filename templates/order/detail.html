@@ -1,0 +1,173 @@
+{% extends '../base.html' %}
+
+{% load static %}
+{% load jalali_tags %}
+
+{% block title %}جزئیات سفارش{% endblock title %}
+
+{% block content %}
+
+<style>
+    .order-product-list {
+        display: flex;
+        list-style: none;
+        padding-bottom: 15px;
+    }
+
+    .order-product-list:not(:last-child) {
+        border-bottom: 1px solid #d4d8dd;
+    }
+
+    .order-product-list li {
+        margin-left: 1rem;
+    }
+</style>
+
+<div class="row invoice-preview">
+    <!-- Invoice -->
+    <div class="col-12 mb-md-0 mb-4">
+        <div class="card invoice-preview-card">
+            <div class="card-body">
+                <div class="row">
+                    {% if request.user.is_staff %}
+                    <div class="col-md-10 mb-2">
+                        <label class="form-label">وضعیت سفارش</label>
+                        <select name="track" id="statusSelect" class="form-select">
+                            <option value="REGISTER" {% if order.track == 'REGISTER' %} selected {% endif %}>ثبت سفارش
+                            </option>
+                            <option value="HOLDING" {% if order.track == 'HOLDING' %} selected {% endif %}>در انتظار
+                                تایید سفارش</option>
+                            <option value="PRODUCING" {% if order.track == 'PRODUCING' %} selected {% endif %}>درحال
+                                تولید
+                            </option>
+                            <option value="PAYING" {% if order.track == 'PAYING' %} selected {% endif %}>در انتظار
+                                تکمیل وجه</option>
+                            <option value="COMPLETE" {% if order.track == 'COMPLETE' %} selected {% endif %}>تکمیل سفارش
+                            </option>
+                            <option value="CANCEL" {% if order.track == 'CANCEL' %} selected {% endif %}>لغو سفارش
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <button type="button" class="btn btn-label-primary" style="margin-top: 1.7rem;"
+                            id="changeStatusBtn" data-id="{{ order.id }}">تغییر وضعیت سفارش</button>
+                    </div>
+                    {% else %}
+                    <div class="col-12 mb-2">
+                        <span class="invoice-number mr-50">وضعیت سفارش</span>
+                        <b>{{ order.get_track }}</b>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div
+                    class="d-flex justify-content-between flex-xl-row flex-md-column flex-sm-row flex-column p-sm-3 p-0">
+                    <div class="mb-xl-0 mb-4">
+                        <div class="d-flex align-items-center svg-illustration mb-3 gap-2">
+                            <span class="app-brand-text h3 mb-0 fw-bold">گروه صنعتی ANG</span>
+                        </div>
+                        <p class="mb-1">تهران ، خیابان شهید بهشتی ، خیابان کاووسی فر</p>
+                        <p class="mb-1">پلاک 23 ، طبقه 2 ، واحد 4 و 5.</p>
+                        <p class="mb-0"><span class="d-inline-block" dir="ltr">(021)86 12 21 00 </span>
+                    </div>
+                    <div>
+                        <h4>شماره سفارش : {{ order.transId }}#</h4>
+                        <div class="mb-2 lh-1-85">
+                            <span class="me-1">تاریخ صدور:</span>
+                            <span class="fw-semibold">{{ order.createdAt|to_jalali:'%y/%m/%d' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-0">
+            <div class="card-body">
+                <div class="row p-sm-3 p-0">
+                    <div class="col-xl-6 col-md-12 col-sm-5 col-12 mb-xl-0 mb-md-4 mb-sm-0 mb-4">
+                        <h6 class="pb-2">صورتحساب به:</h6>
+                        <p class="mb-1">
+                            نام و نام خانوادگی :
+                            <b>{{ order.user.profile.get_full_name }}</b>
+                        </p>
+                        {% if order.user.profile.role == '2' %}
+                        <p class="mb-1">
+                            نام شرکت :
+                            <b>{{ order.user.profile.legal.company_name }}</b>
+                        </p>
+                        {% endif %}
+                        <p class="mb-1">
+                            آدرس :
+                            <b>{{ order.user.profile.state.name }}.{{ order.user.profile.city.name }}.{{ order.user.profile.address }}</b>
+                        </p>
+                        <p class="mb-1">
+                            شماره تماس :
+                            <b>{{ order.user.profile.mobile }}</b>
+                        </p>
+                    </div>
+                    <!-- <div class="col-xl-6 col-md-12 col-sm-7 col-12">
+                        <h6 class="pb-2">قبض به:</h6>
+                        <table class="lh-2">
+                            <tbody>
+                                <tr>
+                                    <td class="pe-3">مجموع سررسید:</td>
+                                    <td>12,000,000 تومان</td>
+                                </tr>
+                                <tr>
+                                    <td class="pe-3">نام بانک:</td>
+                                    <td>بانک آمریکا</td>
+                                </tr>
+                                <tr>
+                                    <td class="pe-3">کشور:</td>
+                                    <td>ایالات متحده</td>
+                                </tr>
+                                <tr>
+                                    <td class="pe-3">IBAN:</td>
+                                    <td>ETD95476213874685</td>
+                                </tr>
+                                <tr>
+                                    <td class="pe-3">کد SWIFT:</td>
+                                    <td>BR91905</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> -->
+                </div>
+            </div>
+            <hr class="my-0">
+            {% regroup items by productName as product_list  %}
+            {% for productName in product_list %}
+            <div class="table-reponsive text-nowrap">
+                <table class="table">
+                    <h5 class="card-header">{{ productName.grouper }}</h5>
+                    <tbody>
+                        {% for item in productName.list %}
+                        <tr>
+                            <th>کد محصول : {{ item.code }}</th>
+                            {% for i in item.orderitemdetail_set.all %}
+                            <th>
+                                {{ i.featureName }} : {{ i.featureValueName }}
+                            </th>
+                            {% endfor %}
+                            <th>تعداد : {{ item.quantity }}</th>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+            <hr class="my-0">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 lh-1-85">
+                        <a class="btn btn-label-primary d-grid w-100 mb-3" target="_blank"
+                            href="{% url 'order_invoice' order.id %}">
+                            چاپ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Invoice -->
+</div>
+{% endblock content %}

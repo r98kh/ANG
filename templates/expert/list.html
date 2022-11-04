@@ -1,0 +1,111 @@
+{% extends '../base.html' %}
+
+{% load static %}
+{% load jalali_tags %}
+
+{% block title %}لیست کارشناسان{% endblock title %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-style1">
+                <li class="breadcrumb-item">
+                    <a href="#">خانه</a>
+                </li>
+                <li class="breadcrumb-item active">لیست کارشناسان</li>
+            </ol>
+        </nav>
+    </div>
+
+    {% for message in messages %}
+    {% if message.tags == 'error' %}
+    <div class="alert alert-danger">{{ message }}</div>
+    {% else %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endif %}
+    {% endfor %}
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ردیف</th>
+                    <th>نام و نام خانوادگی</th>
+                    <th>نام کاربری</th>
+                    <th>شماره همراه</th>
+                    <th>وضعیت</th>
+                    <th>تاریخ ثبت نام</th>
+                    <th>جزئیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expert in experts %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ expert }}</td>
+                    <td>{{ expert.user.username }}</td>
+                    <td>{{ expert.mobile }}</td>
+                    <td>
+                        <label class="switch switch-success">
+                            <input type="checkbox" class="switch-input statusSwitch" data-id="{{ expert.user.id }}"
+                                data-db="expert" {% if expert.user.is_active %} checked {% endif %}>
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on">
+                                    <i class="bx bx-check"></i>
+                                </span>
+                                <span class="switch-off">
+                                    <i class="bx bx-x"></i>
+                                </span>
+                            </span>
+                        </label>
+                    </td>
+                    <td>{{ expert.user.date_joined|to_jalali:'%y/%m/%d' }}</td>
+                    <td>
+                        <a href="{% url 'expert_edit' expert.id %}">
+                            <i class="bx bx-edit font-medium-1" title="ویرایش"></i>
+                        </a>
+                        <a href="{% url 'users_list' %}?q=&expert={{ expert.id }}&role=&status=&sort=">
+                            <i class="bx bx-group font-medium-1" title="لیست کاربران"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pagination justify-content-center">
+            {% if is_paginated %}
+            <div class="card-footer">
+                <div style="text-align: center;">
+
+                    {% if page_obj.has_previous %}
+                    <a class="btn btn-outline-primary btn-sm  paging" href="#" data-num="1">اولین صفحه</a>
+                    <a class="btn btn-outline-primary btn-sm  paging" href="#"
+                        data-num="{{ page_obj.previous_page_number }}">قبلی</a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <a class="btn btn-primary btn-sm  paging" href="#" data-num="{{ num }}">{{ num }}</a>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="btn btn-outline-primary btn-sm  paging" href="#" data-num="{{ num }}">{{ num }}</a>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a class="btn btn-outline-primary btn-sm  paging" href="#"
+                        data-num="{{ page_obj.next_page_number }}">بعدی</a>
+                    <a class="btn btn-outline-primary btn-sm  paging" href="#"
+                        data-num="{{ page_obj.paginator.num_pages }}">
+                        آخرین صفحه</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- experts edit ends -->
+{% endblock content %}

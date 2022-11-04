@@ -1,0 +1,148 @@
+{% extends './base.html' %}
+
+{% load static %}
+{% load jalali_tags %}
+
+{% block title %}داشبورد{% endblock title %}
+
+{% block content %}
+
+<section id="dashboard-analytics">
+
+<div class="row">
+  <div class="col-12 col-md-12 col-lg-12 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+                  <span class="d-block text-nowrap pt-1">سامانه ثبت سفارش محصولات گروه صنعتی ANG</span>
+
+    </div>
+    </div>
+  </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 col-md-4 col-sm-6">
+            <div class="card text-center">
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="badge-circle badge-circle-lg badge-circle-light-danger mx-auto my-1">
+                            <i class="bx bx-shopping-bag font-medium-5"></i>
+                        </div>
+                        <p class="text-muted mb-0 line-ellipsis">سفارش</p>
+                        <h2 class="mb-0 primary-font">{{ orders|length }}</h2>
+                        <ul class="nav navbar-nav bookmark-icons">
+                            <a href="/order/create/" class="btn btn-outline-primary mr-1 mb0">
+                                <i class="ficon bx bx-plus"></i> ثبت سفارش
+                            </a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-4 col-sm-6">
+            <div class="card text-center">
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="badge-circle badge-circle-lg badge-circle-light-success mx-auto my-1">
+                            <i class="bx bx-message font-medium-5"></i>
+                        </div>
+                        <p class="text-muted mb-0 line-ellipsis">پیام ها</p>
+                        <h2 class="mb-0 primary-font">0</h2>
+                        <ul class="nav navbar-nav bookmark-icons">
+                            <a href="#" class="btn btn-outline-success mr-1 mb0">
+                                <i class="ficon bx bxs-area"></i> مشاهده پیام
+                            </a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-4 col-sm-6">
+            <div class="card text-center">
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="badge-circle badge-circle-lg badge-circle-light-warning mx-auto my-1">
+                            <i class="bx bx-file font-medium-5"></i>
+                        </div>
+                        <p class="text-muted mb-0 line-ellipsis">فایل های ضمیمه شده</p>
+                        <h2 class="mb-0 primary-font">0</h2>
+                        <ul class="nav navbar-nav bookmark-icons">
+                            <a href="#" class="btn btn-outline-warning mr-1 mb0">
+                                <i class="ficon bx bxs-cloud-download"></i> مشاهده فایل
+                            </a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-4 col-sm-6">
+            <div class="card text-center">
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="badge-circle badge-circle-lg badge-circle-light-info mx-auto my-1">
+                            <i class="bx bx-user font-medium-5"></i>
+                        </div>
+                        <p class="text-muted mb-0 line-ellipsis">محصولات</p>
+                        <h2 class="mb-0 primary-font">0</h2>
+                        <ul class="nav navbar-nav bookmark-icons">
+                            <a href="#" class="btn btn btn-outline-info mr-1 mb0">
+                                <i class="ficon bx bx-cart"></i> مشاهده محصولات
+                            </a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row widgets-text-chart">
+        <!-- Notification Widget Starts -->
+        <div class="col-lg-8">
+            <div class="card widget-notification">
+                <div class="card-header border-bottom">
+                    <h4 class="card-title d-flex align-items-center">
+                        <i class="bx bx-bell font-medium-4 mr-1"></i>اعلان ها
+                    </h4>
+                    <div class="heading-elements">
+                        <button type="button" class="btn btn-sm btn-light-primary">خواندن همه</button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            {% for notification in notifications|slice:"10" %}
+                            <li
+                                class="list-group-item list-group-item-action border-0 d-flex align-items-center justify-content-between">
+                                <div class="list-left d-flex align-items-center">
+                                    <div class="list-icon mr-1">
+                                        <div class="avatar bg-rgba-primary m-0 p-25">
+                                            <div class="avatar-content">
+                                                <i class="bx bx-edit-alt text-primary font-medium-5"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="list-content mt-n25">
+                                        <span class="list-title">{{ notification.text }}</span>
+                                        <small
+                                            class="text-muted d-block">{{ notification.create_date|to_jalali:'%y/%m/%d' }}</small>
+                                    </div>
+                                </div>
+                                <div class="readable-mark-icon" data-toggle="tooltip" data-placement="left" title=""
+                                    data-original-title="Mark as read">
+                                    <i class="bx bxs-circle text-light-primary font-medium-1"></i>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Notification Widget Ends -->
+    </div>
+</section>
+{% endblock content %}

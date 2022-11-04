@@ -1,0 +1,111 @@
+{% extends '../base.html' %}
+
+{% load static %}
+{% load jalali_tags %}
+{% load crispy_forms_tags %}
+
+{% block title %}پروفایل کاربری{% endblock title %}
+
+{% block content %}
+<style>
+    label {
+        font-size: 0.75rem;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-style1">
+                <li class="breadcrumb-item">
+                    <a href="#">خانه</a>
+                </li>
+                <li class="breadcrumb-item active">پروفایل</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="card-body">
+        {% for message in messages %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">{{ message }}</div>
+        {% else %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endif %}
+        {% endfor %}
+
+        <form class="form-horizontal error" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    {{ form.fname|as_crispy_field }}
+                </div>
+                <div class="col-md-4 mb-2">
+                    {{ form.lname|as_crispy_field }}
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label for="">شماره همراه*</label>
+                    <input type="text" class="form-control" name="mobile" value="{{ profile.mobile }}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <!-- <label for="birth-date-floating-icon">تاریخ تولد*</label>
+                    <div class="form-group position-relative has-icon-left">
+                        <input type="text" class="form-control shamsi-datepicker-list" placeholder="انتخاب تاریخ"
+                            required name="birth_date" value="{{ profile.birth_date }}">
+                        <div class="form-control-position">
+                            <i class="bx bx-calendar"></i>
+                        </div>
+                    </div> -->
+                    <label for="flatpickr-datetime1" class="form-label">تاریخ تولد*</label>
+                    <input type="text" class="form-control" placeholder="YYYY/MM/DD" id="flatpickr-datetime1"
+                        name="birth_date" required value="{{ profile.birth_date }}">
+                </div>
+                <div class="col-md-6 mb-2">{{ form.id_code|as_crispy_field }}</div>
+            </div>
+            {% if profile.role == '2' %}
+            <div class="row">
+                <div class="col-md-4 mb-2">{{ form.company_name|as_crispy_field }}</div>
+                <div class="col-md-4 mb-2">{{ form.phone|as_crispy_field }}</div>
+                <div class="col-md-4 mb-2">{{ form.finance_code|as_crispy_field }}</div>
+            </div>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <label for="">استان*</label>
+                    <select name="state" id="id_state" class="form-select state_select" data-id="2" required>
+                        <option value="">--------</option>
+                        {% for state in states %}
+                        <option value="{{ state.state_id }}" {% if profile.state.id == state.id %} selected {% endif %}>
+                            {{ state.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label for="">شهر*</label>
+                    <select name="city" id="id_city_2" class="form-select" required>
+                        <option value="{{ profile.city.id }}">{{ profile.city.name }}</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label for="">کدپستی*</label>
+                    <input type="text" class="form-control" name="zipcode" value="{{ profile.zipcode }}">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-12">
+                    <label for="">آدرس*</label>
+                    <textarea class="form-control" name="address" cols="30" rows="1">{{ profile.address }}</textarea>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12" style="text-align: left;">
+                    <button type="submit" name="profile" class="btn btn-label-success mt-1">ویرایش</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

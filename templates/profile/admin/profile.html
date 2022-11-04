@@ -1,0 +1,56 @@
+{% extends '../../base.html' %}
+
+{% load static %}
+{% load jalali_tags %}
+{% load crispy_forms_tags %}
+
+{% block title %}پروفایل کاربری{% endblock title %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-style1">
+                <li class="breadcrumb-item">
+                    <a href="#">خانه</a>
+                </li>
+                <li class="breadcrumb-item active">پروفایل</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="card-body">
+        {% for message in messages %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">{{ message }}</div>
+        {% else %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endif %}
+        {% endfor %}
+
+        <form class="form-horizontal error" method="post">
+            {% csrf_token %}
+
+            <div class="text-light small fw-semibold mb-3">وضعیت</div>
+            <label class="switch switch-square">
+                <input type="checkbox" class="switch-input statusSwitch" data-id="{{ request.user.id }}" data-db="user"
+                    id="customSwitch_{{ request.user.id }}" {% if request.user.is_active %} checked {% endif %}
+                    {% if request.user.is_superuser %} disabled {% endif %}>
+                <span class="switch-toggle-slider">
+                    <span class="switch-on"></span>
+                    <span class="switch-off"></span>
+                </span>
+            </label>
+            <div class="row mt-4">
+                <div class="col-md-6">{{ form.username|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.email|as_crispy_field }}</div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12" style="text-align: left;">
+                    <button type="submit" name="profile" class="btn btn-label-primary mt-1">ویرایش</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
